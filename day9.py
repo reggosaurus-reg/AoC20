@@ -56,30 +56,5 @@ for i, num in enumerate(all_numbers):
             end = j
             break
 
-
-
 contiguous_range = all_numbers[start:end]
 print(min(contiguous_range) + max(contiguous_range))
-
-
-
-
-
-
-
-
-
-
-    #if len(all_numbers) == PREAMBLE:
-    #    for i, a in enumerate(all_numbers):
-    #        for b in all_numbers[i + 1:]:
-    #            if a == b:
-    #                continue
-    #            print(a, b)
-    #            sums.add(a + b)
-
-    #if len(all_numbers) > PREAMBLE:
-    #    if num not in sums:
-    #        print(num)
-    #        break
-
