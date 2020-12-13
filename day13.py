@@ -20,30 +20,16 @@ print(bus * wait)
 
 print("B: ")
 
-buses = {}
+from sympy.ntheory.modular import crt
+
+moduli = []
+residues = []
 for i, b in enumerate(all_buses):
     if b == "x":
         continue
 
     b = int(b)
-    buses[b] = (i, (b - i) % b)
+    moduli.append(b)
+    residues.append((b - i) % b)
 
-#print(buses)
-
-max_step = max(buses.keys())
-t = buses[max_step][1]
-#print("start:", max_step, t)
-while True:
-#for _ in range(5):
-    t += max_step
-    print("t:", t)
-    ok = True
-    for b, info in buses.items():
-#        print(t%b, info[1])
-        if t % b != info[1]:
-            ok = False
-            break
-    if ok:
-        print("correct", t)
-        break
-
+print(crt(moduli, residues)[0])
