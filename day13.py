@@ -20,27 +20,30 @@ print(bus * wait)
 
 print("B: ")
 
-from math import gcd
+buses = {}
+for i, b in enumerate(all_buses):
+    if b == "x":
+        continue
 
-def lcm(a, b):
-    return abs(a*b) // gcd(a, b)
+    b = int(b)
+    buses[b] = (i, (b - i) % b)
 
-def lcm_rec(seq):
-    i, b, d = seq[-1]
-    if len(seq) == 1: # Check last two together?
-        return b
-    else:
-        return lcm(b, lcm_rec(seq[:-1])) - i
+#print(buses)
 
-t = float("inf")
-buses = [(i, int(b), (int(b) - i) % int(b))
-            for i, b in enumerate(all_buses) if b != "x"]
+max_step = max(buses.keys())
+t = buses[max_step][1]
+#print("start:", max_step, t)
+while True:
+#for _ in range(5):
+    t += max_step
+    print("t:", t)
+    ok = True
+    for b, info in buses.items():
+#        print(t%b, info[1])
+        if t % b != info[1]:
+            ok = False
+            break
+    if ok:
+        print("correct", t)
+        break
 
-t = lcm_rec(buses)
-print(t)
-#t = 1068781
-
-for i, b, d in buses:
-    if t % b == d:
-        print(True)
-    print(i, b, d, ":", t % b)
