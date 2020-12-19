@@ -3,59 +3,51 @@ NUMS = "1234567890"
 rows = []
 while True:
     try:
-        rows.append(input())
+        i = input()
+        i = i.replace("(", "( ")
+        i = i.replace(")", " )")
+        rows.append(i.split())
     except:
         break
 
 def parse(row):
-    print(row)
-    left = ""
-    op = ""
-    right = ""
-    jump_index = 0
-    end = len(row) - 1
-    for i, x in enumerate(row):
-        if jump_index and i < jump_index:
-            continue
-        #print(x, ":", left, op, right)
-        if x in NUMS:
-            if op:
-                right += x
-            else:
-                left += x
-        elif x in "+*":
-            op = x
-        elif x == "(":
-            i_start = i + 1
-            i_end = i_start + row[i_start:].index(")")
-            parentheses = row[i_start:i_end]
-            #print("P :", parentheses)
-            right = parse(parentheses)
-            jump_index = i_end
+    #print(f"Parse {row}")
+    char = row.pop(0)
 
-        if x == " " or i == end:
-            if right:
-                left = evaluate(left, op, right)
-                op = ""
-                right = ""
-    #print("L :", left)
-    return left
+    if char == "(":
+        result, row = parse(row)
+    else:
+        result = int(char)
+
+    while len(row):
+        op = row.pop(0)
+        if op == ")":
+            #print(f"{result=}")
+            return result, row
+
+        char = row.pop(0)
+        if char == "(":
+            right, row = parse(row)
+        else:
+            right = int(char)
 
 
-def evaluate(left, op, right):
-    left = int(left)
-    right = int(right)
-    #print(left, op, right)
-    if op == "+":
-        return left + right
-    elif op == "*":
-        return left * right
+        if op == "*":
+            result *= right
+        if op == "+":
+            result += right
+    #print(f"{result=}")
+    return result
+
 
 def main(rows):
-    for row in rows:
-        print(parse(row))
+    #for row in rows:
+    #    print(parse(row))
+    #    print()
+
+    return sum([parse(row) for row in rows])
 
 
 print("A:")
 
-main(rows)
+print(main(rows))
