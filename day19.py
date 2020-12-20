@@ -1,5 +1,7 @@
+from copy import deepcopy
+
 rules = {}
-expanded = set()
+
 while True:
     row = input()
     if row == "":
@@ -11,7 +13,6 @@ while True:
 
     if rest.startswith("\""):
         match = [rest.strip("\"")]
-        expanded.add(num)
     else:
         match = []
         for seq in rest.split("|"):
@@ -41,7 +42,6 @@ def expand(num):
 
             result += combos
 
-    expanded.add(num)
     rules[num] = result
     return result
 
@@ -56,4 +56,33 @@ while True:
 print("A:")
 
 valid = expand(0)
-print(len([m for m in messages if m in valid]))
+valid_messages = [m for m in messages if m in valid]
+print(len(valid_messages))
+print(rules[42])
+print(rules[11] == rules[42] + rules[31])
+
+print("B:")
+
+#rules_B[8] = [[42], [42, 8]]
+#rules_B[11] = [[42, 31], [42, 11, 31]]
+
+for m in [m for m in messages if m not in valid]:
+    FORTYTWO = rules[42]
+    LENGTH = len(FORTYTWO[0])
+    m8 = m
+    match8 = True
+    while m8:
+        if m8[:LENGTH] in FORTYTWO:
+            m8 = m8[LENGTH:]
+            continue
+        match8 = False
+        break
+    if match8:
+        print("Matched 8!")
+        valid_messages.append(m)
+        continue
+
+
+print(len(valid_messages))
+
+#print([expand(0, m) for m in messages])
