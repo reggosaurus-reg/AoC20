@@ -1,6 +1,7 @@
 allergens = {}  # allergen: ingredient, One to one
 ing_app = {}  # appearances
 alg_app = {}  # appearances
+required = {}
 
 # If listed, the allergen is in one of the ingredients. If not listed, might still be!
 
@@ -22,13 +23,16 @@ while True:
     for alg in a:
         alg = alg.strip(",")
         if alg not in allergens:
+            required[alg] = []
             allergens[alg] = []
             alg_app[alg] = 0
         allergens[alg] += i
+        required[alg].append(i)
         alg_app[alg] += 1
 
 
 print("A:")
+
 impossible = {i: [] for i in ing_app.keys()}
 
 for alg in allergens.keys():
@@ -40,22 +44,33 @@ for alg in allergens.keys():
             impossible[i].append(alg)
 
 LEN = len(allergens.keys())
-print(sum([ing_app[i] for i, n in impossible.items() if len(n) == LEN]))
+UNHARMFUL = [i for i, n in impossible.items() if len(n) == LEN]
+print(sum([ing_app[i] for i in UNHARMFUL]))
 
 
 print("B:")
-#to_assign = sorted(allergens.keys(), key=lambda a: len(allergens[a]))
-#assigned = {a: None for a in allergens.keys()}
-#while to_assign: #any(map(lambda i: i is None, assigned.values())):
-#    alg = to_assign.pop(0)
-#    print(alg)
-#    for ing in allergens[alg]:
-#        if ing in assigned.values():
-#            continue
-#        assigned[alg] = ing
-#print(assigned)
-#
-#for i in ingredients:
-#    if i not in assigned:
-#        print(i)
 
+for a in allergens:
+    allergens[a] = set([i for i in allergens[a] if i not in UNHARMFUL])
+    new = []
+    for food in required[a]:
+        new.append(set([i for i in food if i not in UNHARMFUL]))
+    required[a] = []
+    LEN = len(new)
+    all = []
+    for seq in new:
+        for item in seq:
+            all.append(item)
+    for ing in new[0]:
+        if all.count(ing) == LEN:
+            required[a].append(ing)
+
+to_assign = sorted(required.keys(), key=lambda a: len(required[a]))
+assigned = {a: None for a in required.keys()}
+for alg in to_assign:
+    for ing in required[alg]:
+        if ing in assigned.values() or ing in UNHARMFUL:
+            continue
+        assigned[alg] = ing
+
+print(",".join([i for a, i in sorted(assigned.items())]))
