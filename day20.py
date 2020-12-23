@@ -52,11 +52,6 @@ def get_borders(img):
 
 print("A:")
 
-#t = tiles[2971]
-#for i in get_versions(t):
-#    print()
-#    show_tile(i)
-
 borders = {}  # border: [nr]
 for nr, tile in tiles.items():
     tile_versions = get_versions(tile)
@@ -78,26 +73,86 @@ for b, nrs in borders.items():
 result = 1
 for nr, neighs in next_to.items():
     if len(neighs) == 2:
-        print(nr)
         result *= nr
 
 print(result)
 
-#constraints = {nr: [] for nr in domains} # next to other nr:s
 
-#for nr in domains:
-#    for border in tiles[nr]:
+print("B:")
+
+from copy import copy
+
+DIRS = [(1, 0), (0, 1), (-1, 0), (0, -1)]
+UP = SIZE - 1
+CORNERS = [(0, 0), (0, UP), (UP, 0), (UP, UP)]
+SIDES = list(set([(0, y) for y in range(SIZE)] +
+                 [(UP, y) for y in range(SIZE)] +
+                 [(x, 0) for x in range(SIZE)] +
+                 [(x, UP) for x in range(SIZE)])
+             - set(CORNERS))
 
 
-final_image = {(x, y): None for x in range(SIZE) for y in range(SIZE)}
-variables = list(final_image.keys())  # positions
+def pos_add(a, b):
+    return a[0] + b[0], a[1] + b[1]
 
-def first_free(img):
-    for v in variables:
-        if img[v] is None:
-            return v
-    return False
+entire_image = {(x, y): [] for x in range(SIZE) for y in range(SIZE)}
+variables = list(entire_image.keys())  # positions
+possible = {nr: [] for nr in domains}
 
-to_assign = list(tiles.keys())
+for nr in next_to.keys():
+    n = len(next_to[nr])
+    if n == 2:
+        possible[nr] = CORNERS
+    elif n == 3:
+        possible[nr] = SIDES
+    elif n == 4:
+        possible[nr] = list(set(variables) - set(SIDES) - set(CORNERS))
 
-#print(variables)
+for nr, poses in possible.items():
+    for p in poses:
+        entire_image[p].append(nr)
+
+def assign(pos, nr):
+    """
+        Assign nr to pos and remove nr from all other pos
+        and update what values are possible.
+    """
+    entire_image[pos] = nr
+    neigh_poses = [pos_add(pos, d) for d in DIRS]
+    nexts = next_to[nr]
+
+    for npos, nrs in entire_image.items():
+        # Skip already assigned
+        if isinstance(nrs, int):
+            continue
+
+        # Remove the assigned nr from other poses
+        if nr in nrs[:]:
+            nrs.remove(nr)
+
+        # Remove invalid neighbours
+        if npos in neigh_poses:
+            for n in nrs[:]:
+                if n not in nexts:
+                    nrs.remove(n)
+
+
+# Assign top left square
+
+assign((0, 0), entire_image[(0, 0)][0])
+assign((0, 1), entire_image[(0, 1)][0])
+assign((1, 0), entire_image[(1, 0)][0])
+assign((1, 1), entire_image[(1, 1)][0])
+
+# Assign rest, going by frontier
+for front in range(2, SIZE):
+    seq = list(range(front)) + [front] * (front + 1)
+    for i in range(len(seq)):
+        pos = (seq[i], seq[-(i + 1)])
+        assign(pos, entire_image[pos][0])
+
+print()
+print("Entire image")
+for p, nrs in entire_image.items():
+    print(p, nrs)
+print()
