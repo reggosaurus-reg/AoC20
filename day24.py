@@ -82,5 +82,6 @@ for _ in range(DAYS):
             new_floor[tile] = extended_floor[tile]
 
     floor = copy(new_floor)
+    # print(f"Day {_+1}: {sum(floor.values())}") # For progress. ;)
 
 print(sum(floor.values()))
