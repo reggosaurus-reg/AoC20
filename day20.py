@@ -137,19 +137,18 @@ def assign(pos, nr):
                     nrs.remove(n)
 
 
-# Assign top left square
-
-assign((0, 0), entire_image[(0, 0)][0])
-assign((0, 1), entire_image[(0, 1)][0])
-assign((1, 0), entire_image[(1, 0)][0])
-assign((1, 1), entire_image[(1, 1)][0])
-
-# Assign rest, going by frontier
-for front in range(2, SIZE):
-    seq = list(range(front)) + [front] * (front + 1)
-    for i in range(len(seq)):
-        pos = (seq[i], seq[-(i + 1)])
+# Assign, going from left corner, by frontiers
+# 00
+# 01, 10, 11
+# 02, 20, 12, 21, 22
+# 03, 30, 13, 31, 23, 32, 33
+for front in range(SIZE):
+    for a in range(front + 1):
+        pos = (a, front)
         assign(pos, entire_image[pos][0])
+        if a != front:
+            pos = (front, a)
+            assign(pos, entire_image[pos][0])
 
 print()
 print("Entire image")
